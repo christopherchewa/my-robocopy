@@ -1,0 +1,39 @@
+BAT File
+
+NET USE \\RemoteServerName\IPC$ /u:server\user *password* 
+robocopy \\Source\ \\RemoteServerName\DestinationDir\ /XD * /Z /MIR /LOG+:c:\temp\log.log
+NET USE \\RemoteServerName\IPC$ /D
+
+
+
+PowerShell script
+
+# IPC$ share options                #
+$IPCHost = "host_name"              # Host name to create IPC$ share with
+$IPCUser = "domain\user"            # Authentication 
+$IPCPwd  = "Pa$$w0rd"               #                for IPC$ share
+# Copy TO settings                  #
+$DstHost = "host_name"              # Destination Host Name
+$DstDir  = "root_share\folder\name" # Destination Directory Path 
+# Copy FROM settings                # 
+$SrcHost = "host_name"              # Source Host Name
+$SrcDir  = "root_share\folder\name" # Source Directory Path
+# E-Mail Settings                   #
+$LogPath = "c:\full_path.log"       # Full path to log file (c:\temp.name.log)
+$EmailTo = "email@domain.com"       # Recipient email address
+$EmailFrom = "email@domain.com"     # Sender email address
+$EmailSubj = "subject_here"         # Letter Subject
+$EmailBody = "body_here"            # And body
+$EmailSmtpSrv = "server_name"       # SMTP server name (FQDN)
+# Parameters (robocopy keys)        #
+$Params = "/XD * /Z /MIR"           # Specify needed robocopy.exe parameters here
+# Action Block                      #
+NET USE \\$IPCHost\IPC$ /u:$IPCUser $IPCPwd
+robocopy.exe \\$SrcHost\$SrcDir\ \\$DstHost\$DstDir\ $Params /LOG:$LogPath
+NET USE \\$IPCHost\IPC$ /D
+Send-MailMessage -To $EmailTo -From $EmailFrom -Subject $EmailSubj -Body $EmailBody -SmtpServer $EmailSmtpSrv -Attachments $LogPath
+
+
+
+Example:
+robocopy \\10.1.2.111\Users\admin\Documents C:\Users\admin\Documents /S /E /Z /ZB /R:5 /W:5 /TBD /NP /V /MT:16
